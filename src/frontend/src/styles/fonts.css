@@ -94,3 +94,11 @@
   font-weight: normal;
   font-style: normal;
 }
+
+@font-face {
+    font-family: 'space_monoregular';
+    src: url('/fonts/spacemono-regular-webfont.woff2') format('woff2'),
+         url('/fonts/spacemono-regular-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
