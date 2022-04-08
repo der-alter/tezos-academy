@@ -6,8 +6,25 @@ import { useState } from 'react'
 import { useLocation } from 'react-router-dom'
 
 import { PENDING, RIGHT, WRONG } from '../ChapterAbout/ChapterAbout.constants'
-//prettier-ignore
-import { Button, ButtonBorder, ButtonText, ChapterCourse, ChapterGrid, ChapterH1, ChapterH2, ChapterH3, ChapterItalic, ChapterMonaco, ChapterStyled, ChapterTab, ChapterValidator, ChapterValidatorContent, ChapterValidatorContentWrapper, ChapterValidatorInside, ChapterValidatorTitle } from "../ChapterAbout/ChapterAbout.style";
+import {
+  Button,
+  ButtonBorder,
+  ButtonText,
+  ChapterCourse,
+  ChapterGrid,
+  ChapterH1,
+  ChapterH2,
+  ChapterH3,
+  ChapterItalic,
+  ChapterMonaco,
+  ChapterStyled,
+  ChapterTab,
+  ChapterValidator,
+  ChapterValidatorContent,
+  ChapterValidatorContentWrapper,
+  ChapterValidatorInside,
+  ChapterValidatorTitle,
+} from '../ChapterAbout/ChapterAbout.style'
 import { Dialog } from './Chapter.components/Dialog/Dialog.controller'
 import { Light } from './Chapter.components/Light/Light.view'
 
@@ -23,14 +40,14 @@ const monacoFontOpt = {
   fontFamily: 'space_monoregular',
 }
 
-const MonacoReadOnly = ({ children }: any) => {
+const MonacoReadOnly = ({ language, children }: any) => {
   const height = children.split('\n').length * 22
   return (
     <div style={{ marginTop: '10px' }}>
       <Editor
         height={height}
         value={children}
-        language="pascaligo"
+        language={language}
         theme={monacoTheme}
         options={{
           ...monacoFontOpt,
@@ -45,21 +62,21 @@ const MonacoReadOnly = ({ children }: any) => {
   )
 }
 
-const MonacoEditorSupport = ({ support }: any) => {
+const MonacoEditorSupport = ({ language, support }: any) => {
   return (
     <div>
-      <Editor height="500px" value={support} language="pascaligo" theme="myCustomTheme" options={monacoFontOpt} />
+      <Editor height="500px" value={support} {...{language}} theme={monacoTheme} options={monacoFontOpt} />
     </div>
   )
 }
 
-const MonacoEditor = ({ proposedSolution, proposedSolutionCallback }: any) => {
+const MonacoEditor = ({ language, proposedSolution, proposedSolutionCallback }: any) => {
   return (
     <div>
       <Editor
         height="500px"
         value={proposedSolution}
-        language="pascaligo"
+        language={language}
         theme={monacoTheme}
         onChange={(val, _) => proposedSolutionCallback(val)}
         options={{ ...monacoFontOpt, readOnly: false }}
@@ -68,15 +85,14 @@ const MonacoEditor = ({ proposedSolution, proposedSolutionCallback }: any) => {
   )
 }
 
-const MonacoDiff = ({ solution, proposedSolution }: any) => {
+const MonacoDiff = ({ language, solution, proposedSolution }: any) => {
   return (
     <div>
       <DiffEditor
         height="500px"
         original={proposedSolution}
         modified={solution}
-        language="pascaligo"
-        // @ts-ignore
+        language={language}
         theme={monacoTheme}
         options={{ ...monacoFontOpt, readOnly: false }}
       />
@@ -117,11 +133,10 @@ const Validator = ({ validatorState, validateCallback }: any) => (
   </ChapterValidator>
 )
 
-const Content = ({ course }: any) => (
+const Content = ({ language, course }: any) => (
   <Markdown
     children={course}
     options={{
-      // disableParsingRawHTML: true,
       overrides: {
         h1: {
           component: ChapterH1,
@@ -134,6 +149,7 @@ const Content = ({ course }: any) => (
         },
         code: {
           component: MonacoReadOnly,
+          props: { language },
         },
         em: {
           component: ChapterItalic,
@@ -173,15 +189,22 @@ export const ChapterView = ({
   const [display, setDisplay] = useState('solution')
   const { pathname } = useLocation()
 
-  let extension = ''
-  if (pathname.match(/pascal/i)) extension = 'ligo'
-  if (pathname.match(/js/i)) extension = 'jsligo'
-  if (pathname.match(/camel/i)) extension = 'mligo'
+  let extension = '',
+    language = ''
+  if (pathname.match(/pascal/i)) {
+    extension = 'ligo'
+    language = 'pascaligo'
+  }
+  if (pathname.match(/js/i)) extension = language = 'jsligo'
+  if (pathname.match(/camel/i)) {
+    extension = 'mligo'
+    language = 'cameligo'
+  }
 
   return (
     <ChapterStyled>
       <ChapterCourse>
-        <Content course={course || ''} />
+        <Content course={course || ''} {...{ language }} />
       </ChapterCourse>
       <ChapterGrid hasTabs={Object.keys(supports).length > 0}>
         {Object.keys(supports).length > 0 && (
@@ -199,17 +222,17 @@ export const ChapterView = ({
         {display === 'solution' ? (
           <ChapterMonaco>
             {showDiff ? (
-              <MonacoDiff solution={solution} proposedSolution={proposedSolution} />
+              <MonacoDiff {...{ language, solution, proposedSolution }} />
             ) : (
-              <MonacoEditor proposedSolution={proposedSolution} proposedSolutionCallback={proposedSolutionCallback} />
+              <MonacoEditor {...{ language, proposedSolution, proposedSolutionCallback }} />
             )}
           </ChapterMonaco>
         ) : (
           <ChapterMonaco>
-            <MonacoEditorSupport support={supports[display]} />
+            <MonacoEditorSupport {...{language}} support={supports[display]} />
           </ChapterMonaco>
         )}
-        <Validator validatorState={validatorState} validateCallback={validateCallback} />
+        <Validator {...{ validatorState, validateCallback }} />
       </ChapterGrid>
     </ChapterStyled>
   )
