@@ -11,11 +11,6 @@ yarn
 Start everything:
 
 ```sh
+docker compose -f ./stack.yml up
 yarn start
-```
-
-if you get an error ERR_OSSL_EVP_UNSUPPORTED
-
-```sh
-export NODE_OPTIONS=--openssl-legacy-provider
 ```
