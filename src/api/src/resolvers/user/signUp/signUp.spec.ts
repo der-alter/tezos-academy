@@ -42,7 +42,6 @@ describe('Users', () => {
     expect(ctx1.body.jwt).toBeDefined()
     expect(verifyRecaptchaTokenObject.verifyRecaptchaToken).toHaveBeenCalled()
     expect(getSignedJwtObject.getSignedJwt).toHaveBeenCalled()
-    expect(createCaptchaObject.createCaptcha).toHaveBeenCalled()
     expect(sendEmailVerifyEmailObject.sendEmailVerifyEmail).toHaveBeenCalled()
 
     const user: User | null = await UserModel.findOne({ username: ctx1.request.body.username }).lean()
